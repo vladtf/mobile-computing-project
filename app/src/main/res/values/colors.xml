@@ -2,4 +2,10 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    
+    <!-- Transaction status colors -->
+    <color name="transaction_status_success">#4CAF50</color>
+    <color name="transaction_status_failed">#F44336</color>
+    <color name="transaction_status_pending">#FF9800</color>
+    <color name="transaction_status_default">#9E9E9E</color>
 </resources>

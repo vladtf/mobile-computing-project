@@ -2,21 +2,9 @@
     <string name="app_name">MC Project</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">Todo List</string>
-    <string name="second_fragment_label">Second Fragment</string>
+    <string name="second_fragment_label">MultiversX Transactions</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
-
-    <!-- Todo app strings -->
-    <string name="enter_todo">Enter a new todo</string>
-    <string name="add">Add</string>
-    <string name="delete_todo">Delete todo</string>
-    <string name="no_todos">No todos yet. Add one to get started!</string>
-    <string name="todo_added">Todo added</string>
-    <string name="todo_deleted">Todo deleted</string>
-    <string name="todo_completed">Todo completed</string>
-    <string name="todo_uncompleted">Todo uncompleted</string>
-    <string name="enter_todo_text">Please enter todo text</string>
 
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
@@ -54,4 +42,38 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
+    
+    <!-- Blockchain strings -->
+    <string name="registration_fees">Registration Fees</string>
+    <string name="regular_fee">Regular Fee:</string>
+    <string name="vip_fee">VIP Fee:</string>
+    <string name="regular_participants">Regular Participants</string>
+    <string name="vip_participants">VIP Participants</string>
+    <string name="refresh_data">Refresh Data</string>
+    <string name="vip">VIP</string>
+    <string name="egld_format">%s EGLD</string>
+    <string name="loading">Loading…</string>
+    <string name="error_loading">Error loading data</string>
+    <string name="no_participants">No participants yet</string>
+    
+    <!-- Transaction strings -->
+    <string name="account_info">Account Information</string>
+    <string name="account_balance">Balance:</string>
+    <string name="account_nonce">Nonce:</string>
+    <string name="transactions_title">Recent Transactions</string>
+    <string name="transaction_hash">Hash:</string>
+    <string name="transaction_from">From:</string>
+    <string name="transaction_to">To:</string>
+    <string name="transaction_value">Value:</string>
+    <string name="transaction_fee">Fee:</string>
+    <string name="transaction_status">Status:</string>
+    <string name="no_transactions">No transactions found</string>
+    <string name="view_transactions">View Transactions</string>
+    
+    <!-- Error messages -->
+    <string name="error_loading_account">Error loading account: %s</string>
+    <string name="no_transactions_found">No transactions found</string>
+    <string name="unable_to_load_transactions">Unable to load transactions</string>
+    <string name="error_generic">Error: %s</string>
+    <string name="unknown_error">Unknown error</string>
 </resources>

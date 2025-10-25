@@ -47,6 +47,26 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     
+    // Lifecycle components
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.core)
+    
+    // Network - Required by erdkotlin
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.moshi)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
+    implementation(libs.moshi)
+    implementation(libs.moshi.kotlin)
+    implementation(libs.gson)
+    
+    // BitcoinJ - Required by erdkotlin for Bech32 encoding
+    implementation(libs.bitcoinj.core)
+    
     // Local erdkotlin JAR from mx-sdk-kotlin build
     implementation(files("libs/erdkotlin-0.4.0.jar"))
     
