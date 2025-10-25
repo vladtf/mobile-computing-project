@@ -18,8 +18,6 @@ import java.util.concurrent.TimeUnit
 class MultiversXSdkService(
     private val network: ElrondNetwork = ElrondNetwork.DevNet
 ) {
-    // TAG constant moved to companion object below
-
     private val httpClient = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)

@@ -13,40 +13,33 @@ import com.vti.mcproject.databinding.FragmentSecondBinding
 import kotlinx.coroutines.launch
 
 /**
- * Fragment for displaying MultiversX blockchain data using erdkotlin SDK
+ * Fragment for displaying MultiversX blockchain data
  */
 class SecondFragment : Fragment() {
 
     private var _binding: FragmentSecondBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
     private lateinit var transactionAdapter: TransactionAdapter
     private lateinit var multiversXService: MultiversXSdkService
 
-    // Contract address
-    private val contractAddress = MultiversXSdkService.CONTRACT_ADDRESS
-
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         _binding = FragmentSecondBinding.inflate(inflater, container, false)
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         multiversXService = MultiversXSdkService()
-        
+
         setupRecyclerView()
         setupClickListeners()
-        
+
         // Load initial data
         loadAccountData()
         loadTransactions()
@@ -66,9 +59,9 @@ class SecondFragment : Fragment() {
 
     private fun loadAccountData() {
         binding.progressAccount.isVisible = true
-        
+
         viewLifecycleOwner.lifecycleScope.launch {
-            multiversXService.getAccountInfo(contractAddress).fold(
+            multiversXService.getAccountInfo(MultiversXSdkService.CONTRACT_ADDRESS).fold(
                 onSuccess = { accountInfo ->
                     binding.progressAccount.isVisible = false
                     binding.textAccountAddress.text = accountInfo.address
@@ -91,12 +84,12 @@ class SecondFragment : Fragment() {
         binding.progressTransactions.isVisible = true
         binding.recyclerTransactions.isVisible = false
         binding.textNoTransactions.isVisible = false
-        
+
         viewLifecycleOwner.lifecycleScope.launch {
-            multiversXService.getTransactions(contractAddress).fold(
+            multiversXService.getTransactions(MultiversXSdkService.CONTRACT_ADDRESS).fold(
                 onSuccess = { transactions ->
                     binding.progressTransactions.isVisible = false
-                    
+
                     if (transactions.isEmpty()) {
                         binding.textNoTransactions.isVisible = true
                         binding.textNoTransactions.text = getString(R.string.no_transactions_found)
