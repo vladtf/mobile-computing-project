@@ -76,4 +76,36 @@
     <string name="unable_to_load_transactions">Unable to load transactions</string>
     <string name="error_generic">Error: %s</string>
     <string name="unknown_error">Unknown error</string>
+    
+    <!-- Election creation -->
+    <string name="create_election_title">Create New Election</string>
+    <string name="election_name">Election Name</string>
+    <string name="election_description">Election Description</string>
+    <string name="election_type">Election Type</string>
+    <string name="election_type_single">Single Choice (voters select one candidate)</string>
+    <string name="election_type_multiple">Multiple Choice (voters select multiple candidates)</string>
+    <string name="election_type_ranked">Ranked Choice (voters rank candidates by preference)</string>
+    <string name="start_date_time">Start Date &amp; Time</string>
+    <string name="end_date_time">End Date &amp; Time</string>
+    <string name="select_date">Select Date</string>
+    <string name="select_time">Select Time</string>
+    <string name="no_date_selected">No date selected</string>
+    <string name="create_election">Create Election</string>
+    <string name="create_election_button">Create Election</string>
+    
+    <!-- Election creation errors -->
+    <string name="error_empty_name">Election name cannot be empty</string>
+    <string name="error_empty_description">Election description cannot be empty</string>
+    <string name="error_no_start_date">Please select a start date and time</string>
+    <string name="error_no_end_date">Please select an end date and time</string>
+    <string name="error_invalid_dates">Start date must be before end date</string>
+    <string name="error_past_start_date">Start date must be in the future</string>
+    <string name="error_creating_election">Error creating election: %s</string>
+    <string name="election_created_success">Election created successfully!</string>
+    <string name="creating_election">Creating election…</string>
+    
+    <!-- Bottom Navigation -->
+    <string name="nav_transactions">Transactions</string>
+    <string name="nav_elections">Elections</string>
+    <string name="nav_profile">Profile</string>
 </resources>

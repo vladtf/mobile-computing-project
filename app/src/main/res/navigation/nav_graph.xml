@@ -9,5 +9,25 @@
         android:id="@+id/SecondFragment"
         android:name="com.vti.mcproject.SecondFragment"
         android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second" />
+        tools:layout="@layout/fragment_second">
+        <action
+            android:id="@+id/action_SecondFragment_to_CreateElectionFragment"
+            app:destination="@id/CreateElectionFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/FirstFragment"
+        android:name="com.vti.mcproject.FirstFragment"
+        android:label="@string/nav_elections"
+        tools:layout="@layout/fragment_first">
+        <action
+            android:id="@+id/action_FirstFragment_to_CreateElectionFragment"
+            app:destination="@id/CreateElectionFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/CreateElectionFragment"
+        android:name="com.vti.mcproject.CreateElectionFragment"
+        android:label="@string/create_election_title"
+        tools:layout="@layout/fragment_create_election" />
 </navigation>

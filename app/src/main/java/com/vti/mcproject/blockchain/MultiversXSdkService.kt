@@ -65,6 +65,34 @@ class MultiversXSdkService(
     )
 
     /**
+     * Enum for election types
+     */
+    enum class ElectionType(val value: Long) {
+        SINGLE_CHOICE(0L),
+        MULTIPLE_CHOICE(1L),
+        RANKED_CHOICE(2L);
+
+        companion object {
+            fun fromValue(value: Long): ElectionType {
+                return values().find { it.value == value } ?: SINGLE_CHOICE
+            }
+        }
+    }
+
+    /**
+     * Data class for election information
+     */
+    data class Election(
+        val id: Long,
+        val name: String,
+        val description: String,
+        val electionType: ElectionType,
+        val startTime: Long,
+        val endTime: Long,
+        val status: String
+    )
+
+    /**
      * Get account information for a given address
      */
     suspend fun getAccountInfo(addressBech32: String): Result<AccountInfo> = withContext(Dispatchers.IO) {
@@ -263,6 +291,62 @@ class MultiversXSdkService(
             egld.stripTrailingZeros().toPlainString()
         } catch (e: Exception) {
             "0"
+        }
+    }
+
+    /**
+     * Register a new election on the smart contract
+     * @param name Election name
+     * @param description Election description
+     * @param electionType Type of election (single, multiple, or ranked choice)
+     * @param startTime Election start timestamp in seconds
+     * @param endTime Election end timestamp in seconds
+     * @param walletPem PEM file contents for signing the transaction
+     * @return Result with transaction hash if successful
+     */
+    suspend fun registerElection(
+        name: String,
+        description: String,
+        electionType: ElectionType,
+        startTime: Long,
+        endTime: Long,
+        walletPem: String
+    ): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            Log.d(TAG, "Registering election: $name")
+            
+            // Validate inputs
+            if (name.isBlank()) {
+                return@withContext Result.failure(IllegalArgumentException("Election name cannot be empty"))
+            }
+            if (description.isBlank()) {
+                return@withContext Result.failure(IllegalArgumentException("Election description cannot be empty"))
+            }
+            if (startTime >= endTime) {
+                return@withContext Result.failure(IllegalArgumentException("Start time must be before end time"))
+            }
+            if (startTime < System.currentTimeMillis() / 1000) {
+                return@withContext Result.failure(IllegalArgumentException("Start time must be in the future"))
+            }
+
+            // Note: This is a simplified implementation
+            // In production, you would need to:
+            // 1. Load wallet from PEM
+            // 2. Build transaction data with encoded function name and arguments
+            // 3. Sign transaction with wallet
+            // 4. Send transaction to network
+            // 5. Return transaction hash
+            
+            // For now, we'll return a placeholder indicating the structure is in place
+            Log.w(TAG, "Election registration not fully implemented - requires wallet integration")
+            Result.failure(UnsupportedOperationException(
+                "Election registration requires wallet integration. " +
+                "Please implement transaction signing and sending."
+            ))
+            
+        } catch (e: Exception) {
+            Log.e(TAG, "Error registering election", e)
+            Result.failure(e)
         }
     }
 

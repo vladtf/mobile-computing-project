@@ -6,6 +6,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import android.view.Menu
 import android.view.MenuItem
 import com.vti.mcproject.databinding.ActivityMainBinding
@@ -24,8 +25,18 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
 
         val navController = findNavController(R.id.nav_host_fragment_content_main)
-        appBarConfiguration = AppBarConfiguration(navController.graph)
+        
+        // Define top-level destinations (no back button shown for these)
+        appBarConfiguration = AppBarConfiguration(
+            setOf(R.id.SecondFragment, R.id.FirstFragment)
+        )
+        
         setupActionBarWithNavController(navController, appBarConfiguration)
+        
+        // Setup bottom navigation
+        binding.root.findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(
+            R.id.bottom_navigation
+        )?.setupWithNavController(navController)
 
         // Hide FAB - not needed for blockchain view
         binding.fab.hide()

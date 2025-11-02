@@ -3,10 +3,16 @@ package com.vti.mcproject
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.vti.mcproject.blockchain.MultiversXSdkService
 import com.vti.mcproject.databinding.FragmentSecondBinding
@@ -38,7 +44,7 @@ class SecondFragment : Fragment() {
         multiversXService = MultiversXSdkService()
 
         setupRecyclerView()
-        setupClickListeners()
+        setupMenu()
 
         // Load initial data
         loadAccountData()
@@ -50,11 +56,27 @@ class SecondFragment : Fragment() {
         binding.recyclerTransactions.adapter = transactionAdapter
     }
 
-    private fun setupClickListeners() {
-        binding.buttonRefresh.setOnClickListener {
-            loadAccountData()
-            loadTransactions()
-        }
+    private fun setupMenu() {
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_transactions, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.action_refresh -> {
+                        loadAccountData()
+                        loadTransactions()
+                        true
+                    }
+                    R.id.action_create_election -> {
+                        findNavController().navigate(R.id.action_SecondFragment_to_CreateElectionFragment)
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     private fun loadAccountData() {
