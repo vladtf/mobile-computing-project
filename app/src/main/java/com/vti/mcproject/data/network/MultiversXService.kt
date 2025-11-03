@@ -1,4 +1,4 @@
-package com.vti.mcproject.blockchain
+package com.vti.mcproject.data.network
 
 import android.util.Log
 import com.elrond.erdkotlin.ElrondNetwork
@@ -15,9 +15,9 @@ import java.math.BigInteger
 import java.util.concurrent.TimeUnit
 
 /**
- * Service for interacting with MultiversX blockchain using erdkotlin SDK
+ * Service for interacting with MultiversX blockchain API
  */
-class MultiversXSdkService(
+class MultiversXService(
     private val network: ElrondNetwork = ElrondNetwork.DevNet
 ) {
     private val httpClient = OkHttpClient.Builder()
@@ -26,7 +26,6 @@ class MultiversXSdkService(
         .addInterceptor { chain ->
             val request = chain.request()
             Log.d(TAG, "HTTP Request: ${request.method} ${request.url}")
-            Log.d(TAG, "Headers: ${request.headers}")
             
             val response = chain.proceed(request)
             Log.d(TAG, "HTTP Response: ${response.code} ${response.message}")
@@ -36,19 +35,9 @@ class MultiversXSdkService(
         .build()
 
     init {
-        // Set the network for the SDK
         ErdSdk.setNetwork(network)
         Log.d(TAG, "Initialized with network: ${network.url()}")
     }
-
-    /**
-     * Data class for transaction information
-     */
-
-
-    /**
-     * Data class for account information
-     */
 
     /**
      * Get account information for a given address
@@ -58,8 +47,6 @@ class MultiversXSdkService(
             Log.d(TAG, "Fetching account info for: $addressBech32")
             
             val address = Address.fromBech32(addressBech32)
-            Log.d(TAG, "Address parsed: ${address.bech32()}")
-            
             val account = ErdSdk.getAccountUsecase().execute(address)
             
             val balanceInEgld = convertWeiToEgld(account.balance.toString())
@@ -83,8 +70,7 @@ class MultiversXSdkService(
     }
 
     /**
-     * Get transactions for a given address using direct API call
-     * Using /accounts/{address}/transfers endpoint as the SDK uses outdated endpoint
+     * Get transactions for a given address
      */
     suspend fun getTransactions(addressBech32: String): Result<List<Transaction>> = withContext(Dispatchers.IO) {
         try {
@@ -92,9 +78,8 @@ class MultiversXSdkService(
             
             // Validate address
             val address = Address.fromBech32(addressBech32)
-            Log.d(TAG, "Address parsed successfully: ${address.bech32()}")
+            Log.d(TAG, "Address validated: ${address.bech32()}")
             
-            // Use the correct API endpoint: /accounts/{address}/transfers
             val url = "${network.url()}/accounts/${addressBech32}/transfers?from=0&size=25"
             Log.d(TAG, "API URL: $url")
             
@@ -121,7 +106,7 @@ class MultiversXSdkService(
             Result.success(txList)
         } catch (e: Exception) {
             Log.e(TAG, "Error fetching transactions", e)
-            Result.success(emptyList()) // Return empty list instead of error for better UX
+            Result.success(emptyList()) // Return empty list for better UX
         }
     }
     
@@ -143,7 +128,6 @@ class MultiversXSdkService(
                 val timestamp = txJson.optLong("timestamp", 0L)
                 val status = txJson.optString("status", "unknown")
                 
-                // Note: transfers API doesn't provide fee and gasUsed in the same way
                 val transaction = Transaction(
                     hash = txHash,
                     sender = sender,
@@ -151,8 +135,8 @@ class MultiversXSdkService(
                     value = convertWeiToEgld(value),
                     timestamp = timestamp,
                     status = status,
-                    fee = "0", // Not available in transfers endpoint
-                    data = "", // Not available in transfers endpoint
+                    fee = "0",
+                    data = "",
                     gasUsed = 0L,
                     gasLimit = 0L
                 )
@@ -164,78 +148,6 @@ class MultiversXSdkService(
         } catch (e: Exception) {
             Log.e(TAG, "Error parsing transactions", e)
             return emptyList()
-        }
-    }
-
-    /**
-     * Get specific transaction information by hash
-     */
-    suspend fun getTransactionInfo(txHash: String): Result<Transaction?> = withContext(Dispatchers.IO) {
-        try {
-            Log.d(TAG, "Fetching transaction info for hash: $txHash")
-            
-            val txInfo = ErdSdk.getTransactionInfoUsecase().execute(txHash, null)
-            
-            val transaction = Transaction(
-                hash = txHash, // Use the hash we queried with
-                sender = txInfo.sender.bech32(),
-                receiver = txInfo.receiver.bech32(),
-                value = convertWeiToEgld(txInfo.value.toString()),
-                timestamp = 0L, // Not available in TransactionInfo
-                status = txInfo.status,
-                fee = "0", // Not available in TransactionInfo
-                data = txInfo.data ?: "",
-                gasUsed = 0L, // Not available in TransactionInfo
-                gasLimit = txInfo.gasLimit
-            )
-            
-            Result.success(transaction)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error fetching transaction info", e)
-            Result.failure(e)
-        }
-    }
-
-    /**
-     * Get transaction status
-     */
-    suspend fun getTransactionStatus(txHash: String): Result<String> = withContext(Dispatchers.IO) {
-        try {
-            Log.d(TAG, "Fetching transaction status for hash: $txHash")
-            
-            val status = ErdSdk.getTransactionStatusUsecase().execute(txHash, null)
-            
-            Result.success(status)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error fetching transaction status", e)
-            Result.failure(e)
-        }
-    }
-
-    /**
-     * Query smart contract
-     */
-    suspend fun queryContract(
-        contractAddress: String,
-        functionName: String,
-        args: List<String> = emptyList()
-    ): Result<String> = withContext(Dispatchers.IO) {
-        try {
-            Log.d(TAG, "Querying contract: $contractAddress, function: $functionName")
-            
-            val address = Address.fromBech32(contractAddress)
-            val result = ErdSdk.queryContractStringUsecase().execute(
-                contractAddress = address,
-                funcName = functionName,
-                args = args,
-                caller = null,
-                value = null
-            )
-            
-            Result.success(result.data)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error querying contract", e)
-            Result.failure(e)
         }
     }
 
@@ -253,7 +165,7 @@ class MultiversXSdkService(
     }
 
     companion object {
-        const val TAG = "MultiversXSdkService"
+        const val TAG = "MultiversXService"
         const val CONTRACT_ADDRESS = "erd1qqqqqqqqqqqqqpgquvpnteagc5xsslc3yc9hf6um6n6jjgzdd8ss07v9ma"
     }
 }
