@@ -4,6 +4,8 @@ import android.util.Log
 import com.elrond.erdkotlin.ElrondNetwork
 import com.elrond.erdkotlin.ErdSdk
 import com.elrond.erdkotlin.domain.wallet.models.Address
+import com.vti.mcproject.data.model.AccountInfo
+import com.vti.mcproject.data.model.Transaction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -42,27 +44,11 @@ class MultiversXSdkService(
     /**
      * Data class for transaction information
      */
-    data class Transaction(
-        val hash: String,
-        val sender: String,
-        val receiver: String,
-        val value: String,
-        val timestamp: Long,
-        val status: String,
-        val fee: String,
-        val data: String? = null,
-        val gasUsed: Long = 0,
-        val gasLimit: Long = 0
-    )
+
 
     /**
      * Data class for account information
      */
-    data class AccountInfo(
-        val address: String,
-        val balance: String,
-        val nonce: Long
-    )
 
     /**
      * Get account information for a given address

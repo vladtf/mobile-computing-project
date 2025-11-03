@@ -17,43 +17,35 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.vti.mcproject.blockchain.MultiversXSdkService
-
-private val mockAccountInfo = MultiversXSdkService.AccountInfo(
-    address = "erd1qqqqqqqqqqqqqpgquvpnteagc5xsslc3yc9hf6um6n6jjgzdd8ss07v9ma",
-    balance = "1234.567",
-    nonce = 42
-)
-
-private val mockTransactions = listOf(
-    MultiversXSdkService.Transaction(
-        hash = "abc123", sender = "erd1sender", receiver = "erd1receiver",
-        value = "100.5", timestamp = 1699000000L, status = "success",
-        fee = "0.001", data = "", gasUsed = 50000L, gasLimit = 60000L
-    ),
-    MultiversXSdkService.Transaction(
-        hash = "xyz987", sender = "erd1alice", receiver = "erd1bob",
-        value = "50.25", timestamp = 1698900000L, status = "pending",
-        fee = "0.0005", data = "", gasUsed = 30000L, gasLimit = 40000L
-    ),
-    MultiversXSdkService.Transaction(
-        hash = "mno456", sender = "erd1charlie", receiver = "erd1dave",
-        value = "25.0", timestamp = 1698800000L, status = "failed",
-        fee = "0.0008", data = "", gasUsed = 45000L, gasLimit = 50000L
-    )
-)
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.vti.mcproject.data.model.Transaction
+import com.vti.mcproject.data.repository.AccountInfoRepository
+import com.vti.mcproject.data.repository.TransactionRepository
+import com.vti.mcproject.ui.viewmodel.TransactionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TransactionsListScreen() {
+fun TransactionsScreen(
+    viewModel: TransactionViewModel = viewModel {
+        TransactionViewModel(
+            transactionRepository = TransactionRepository(),
+            accountInfoRepository = AccountInfoRepository()
+        )
+    }
+) {
+    val transactions by viewModel.transactions.collectAsState()
+    val accountInfo by viewModel.accountInfo.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("MultiversX Transactions") },
                 actions = {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = { viewModel.refresh() }) {
                         Icon(Icons.Default.Refresh, contentDescription = "Refresh")
                     }
                 }
@@ -69,7 +61,7 @@ fun TransactionsListScreen() {
         ) {
             item {
                 Text(
-                    text = "Balance: ${mockAccountInfo.balance} EGLD",
+                    text = "Balance: ${accountInfo?.balance ?: "..."} EGLD",
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
@@ -77,12 +69,12 @@ fun TransactionsListScreen() {
 
             item {
                 Text(
-                    text = "Transactions (${mockTransactions.size})",
+                    text = "Transactions (${transactions.size})",
                     style = MaterialTheme.typography.titleMedium
                 )
             }
 
-            items(mockTransactions) { tx ->
+            items(transactions) { tx ->
                 TransactionItem(tx)
             }
         }
@@ -90,7 +82,18 @@ fun TransactionsListScreen() {
 }
 
 @Composable
-private fun TransactionItem(transaction: MultiversXSdkService.Transaction) {
+private fun TransactionItem(transaction: Transaction?) {
+    if (transaction == null) {
+        Text(
+            text = "Loading...",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        )
+        return
+    }
+
     Text(
         text = buildString {
             append("${transaction.value} EGLD • ")
