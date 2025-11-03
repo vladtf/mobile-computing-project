@@ -1,37 +1,24 @@
 package com.vti.mcproject.ui.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vti.mcproject.data.model.Transaction
 import com.vti.mcproject.data.repository.AccountInfoRepository
 import com.vti.mcproject.data.repository.TransactionRepository
-import com.vti.mcproject.ui.viewmodel.TransactionViewModel
+import com.vti.mcproject.ui.viewmodel.TransactionsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionsScreen(
-    viewModel: TransactionViewModel = viewModel {
-        TransactionViewModel(
+    viewModel: TransactionsViewModel = viewModel {
+        TransactionsViewModel(
             transactionRepository = TransactionRepository(),
             accountInfoRepository = AccountInfoRepository()
         )
@@ -39,16 +26,21 @@ fun TransactionsScreen(
 ) {
     val transactions by viewModel.transactions.collectAsState()
     val accountInfo by viewModel.accountInfo.collectAsState()
+    var selectedTransaction by remember { mutableStateOf<Transaction?>(null) }
+
+    // Show detail screen if a transaction is selected
+    selectedTransaction?.let { transaction ->
+        DetailedTransactionScreen(
+            transaction = transaction,
+            onNavigateBack = { selectedTransaction = null }
+        )
+        return
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("MultiversX Transactions") },
-                actions = {
-                    IconButton(onClick = { viewModel.refresh() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Refresh")
-                    }
-                }
+                title = { Text("Transactions") }
             )
         }
     ) { padding ->
@@ -57,53 +49,77 @@ fun TransactionsScreen(
                 .fillMaxSize()
                 .padding(padding),
             contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
                 Text(
-                    text = "Balance: ${accountInfo?.balance ?: "..."} EGLD",
-                    style = MaterialTheme.typography.headlineSmall,
+                    text = "${accountInfo?.balance ?: "0"} EGLD",
+                    style = MaterialTheme.typography.headlineLarge,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
             }
 
-            item {
-                Text(
-                    text = "Transactions (${transactions.size})",
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
-
             items(transactions) { tx ->
-                TransactionItem(tx)
+                tx?.let {
+                    TransactionItem(
+                        transaction = it,
+                        onClick = { selectedTransaction = it }
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-private fun TransactionItem(transaction: Transaction?) {
-    if (transaction == null) {
-        Text(
-            text = "Loading...",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        )
-        return
+private fun TransactionItem(
+    transaction: Transaction,
+    onClick: () -> Unit
+) {
+    val statusColor = when (transaction.status.lowercase()) {
+        "success" -> MaterialTheme.colorScheme.primary
+        "pending" -> MaterialTheme.colorScheme.tertiary
+        "failed", "invalid" -> MaterialTheme.colorScheme.error
+        else -> MaterialTheme.colorScheme.onSurface
     }
 
-    Text(
-        text = buildString {
-            append("${transaction.value} EGLD • ")
-            append(transaction.status.uppercase())
-            append("\n")
-            append("${transaction.sender} → ${transaction.receiver}")
-        },
-        style = MaterialTheme.typography.bodyMedium,
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
-    )
+            .clickable(onClick = onClick)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "${transaction.value} EGLD",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = transaction.status.uppercase(),
+                style = MaterialTheme.typography.labelMedium,
+                color = statusColor
+            )
+        }
+        
+        Spacer(modifier = Modifier.height(4.dp))
+        
+        Text(
+            text = "${shortenAddress(transaction.sender)} → ${shortenAddress(transaction.receiver)}",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        HorizontalDivider()
+    }
+}
+
+private fun shortenAddress(address: String): String {
+    return if (address.length > 13) {
+        "${address.take(6)}...${address.takeLast(4)}"
+    } else {
+        address
+    }
 }

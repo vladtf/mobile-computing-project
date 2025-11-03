@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class TransactionViewModel(
+class DetailedTransactionViewModel(
     private val transactionRepository: TransactionRepository,
     private val accountInfoRepository: AccountInfoRepository
 ) : ViewModel() {
