@@ -10,19 +10,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vti.mcproject.data.model.Transaction
-import com.vti.mcproject.data.repository.AccountInfoRepository
-import com.vti.mcproject.data.repository.TransactionRepository
+import com.vti.mcproject.ui.AppViewModelProvider
 import com.vti.mcproject.ui.viewmodel.TransactionsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionsScreen(
-    viewModel: TransactionsViewModel = viewModel {
-        TransactionsViewModel(
-            transactionRepository = TransactionRepository(),
-            accountInfoRepository = AccountInfoRepository()
-        )
-    }
+    viewModel: TransactionsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val transactions by viewModel.transactions.collectAsState()
     val accountInfo by viewModel.accountInfo.collectAsState()

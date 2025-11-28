@@ -10,7 +10,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vti.mcproject.data.model.Transaction
+import com.vti.mcproject.ui.AppViewModelProvider
+import com.vti.mcproject.ui.viewmodel.DetailedTransactionViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -18,8 +21,21 @@ import java.util.*
 @Composable
 fun DetailedTransactionScreen(
     transaction: Transaction,
-    onNavigateBack: () -> Unit = {}
+    onNavigateBack: () -> Unit = {},
+    viewModel: DetailedTransactionViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    // Set the transaction in ViewModel when screen is displayed
+    LaunchedEffect(transaction) {
+        viewModel.setTransaction(transaction)
+    }
+
+    // Clear transaction when leaving the screen
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.clearTransaction()
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(

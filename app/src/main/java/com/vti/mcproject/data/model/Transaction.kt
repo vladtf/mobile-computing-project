@@ -1,10 +1,16 @@
 package com.vti.mcproject.data.model
 
 import android.util.Log
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.vti.mcproject.utils.CurrencyUtils
 import org.json.JSONArray
 
+@Entity(
+    tableName = "transactions"
+)
 data class Transaction(
+    @PrimaryKey
     val hash: String,
     val sender: String,
     val receiver: String,

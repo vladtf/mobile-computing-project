@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose.compiler)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -71,6 +72,11 @@ dependencies {
     
     // Local erdkotlin JAR from mx-sdk-kotlin build
     implementation(files("libs/erdkotlin-0.4.0.jar"))
+    
+    // Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
     
     // Jetpack Compose
     implementation(platform(libs.androidx.compose.bom))
