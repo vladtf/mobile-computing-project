@@ -35,12 +35,17 @@ class TransactionsViewModel(
                 initialValue = null
             )
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
     init {
         loadData()
     }
 
     fun loadData() {
         viewModelScope.launch {
+            _isLoading.value = true
+            
             // Load account info
             accountInfoRepository.getAccountInfo().fold(
                 onSuccess = { accountInfo ->
@@ -60,6 +65,8 @@ class TransactionsViewModel(
                     println("Error loading transactions: ${exception.message}")
                 }
             )
+            
+            _isLoading.value = false
         }
     }
 
