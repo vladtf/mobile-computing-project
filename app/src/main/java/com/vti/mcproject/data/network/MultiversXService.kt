@@ -75,7 +75,7 @@ class MultiversXService(
             Result.success(Transaction.parseFromJson(jsonString))
         } catch (e: Exception) {
             Log.e(TAG, "Error fetching transactions: ${e.message}", e)
-            Result.success(emptyList())
+            Result.failure(e)
         }
     }
 
