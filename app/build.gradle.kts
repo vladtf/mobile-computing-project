@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose.compiler)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
 }
 
@@ -66,6 +67,9 @@ dependencies {
     implementation(libs.moshi)
     implementation(libs.moshi.kotlin)
     implementation(libs.gson)
+    
+    // Kotlin Serialization
+    implementation(libs.kotlinx.serialization.json)
     
     // BitcoinJ - Required by erdkotlin for Bech32 encoding
     implementation(libs.bitcoinj.core)
