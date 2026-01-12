@@ -6,12 +6,17 @@ import com.elrond.erdkotlin.ErdSdk
 import com.elrond.erdkotlin.domain.wallet.models.Address
 import com.vti.mcproject.data.model.AccountInfo
 import com.vti.mcproject.data.model.Transaction
+import com.vti.mcproject.data.network.dto.TransactionDto
 import com.vti.mcproject.utils.CurrencyUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-import okhttp3.Request
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.resume
 
 /**
  * Service for interacting with MultiversX blockchain API
@@ -19,60 +24,63 @@ import java.util.concurrent.TimeUnit
 class MultiversXService(
     private val network: ElrondNetwork = ElrondNetwork.DevNet
 ) {
+    private val json = Json {
+        ignoreUnknownKeys = true
+        coerceInputValues = true
+    }
+
     private val httpClient = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
+        .addInterceptor(HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        })
         .build()
+
+    private val retrofit = Retrofit.Builder()
+        .baseUrl(network.url() + "/")
+        .client(httpClient)
+        .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+        .build()
+
+    private val api: MultiversXApi = retrofit.create(MultiversXApi::class.java)
 
     init {
         ErdSdk.setNetwork(network)
     }
 
     /**
-     * Get account information for a given address
+     * Get account information for a given address using suspendCancellableCoroutine
      */
-    suspend fun getAccountInfo(addressBech32: String): Result<AccountInfo> = withContext(Dispatchers.IO) {
-        try {
-            val address = Address.fromBech32(addressBech32)
-            val account = ErdSdk.getAccountUsecase().execute(address)
-            
-            Result.success(
-                AccountInfo(
-                    address = addressBech32,
-                    balance = CurrencyUtils.convertWeiToEgld(account.balance.toString()),
-                    nonce = account.nonce
+    suspend fun getAccountInfo(addressBech32: String): Result<AccountInfo> = 
+        suspendCancellableCoroutine { continuation ->
+            try {
+                val address = Address.fromBech32(addressBech32)
+                val account = ErdSdk.getAccountUsecase().execute(address)
+                
+                continuation.resume(
+                    Result.success(
+                        AccountInfo(
+                            address = addressBech32,
+                            balance = CurrencyUtils.convertWeiToEgld(account.balance.toString()),
+                            nonce = account.nonce
+                        )
+                    )
                 )
-            )
-        } catch (e: Exception) {
-            Log.e(TAG, "Error fetching account info: ${e.message}", e)
-            Result.failure(e)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error fetching account info: ${e.message}", e)
+                continuation.resume(Result.failure(e))
+            }
         }
-    }
 
-    /**
-     * Get transactions for a given address
-     */
-    suspend fun getTransactions(addressBech32: String): Result<List<Transaction>> = withContext(Dispatchers.IO) {
-        try {
+    suspend fun getTransactions(addressBech32: String): Result<List<Transaction>> {
+        return try {
             Address.fromBech32(addressBech32) // Validate address
             
-            val url = "${network.url()}/accounts/$addressBech32/transfers?from=0&size=25"
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("Accept", "application/json")
-                .get()
-                .build()
+            val dtos = api.getTransfers(addressBech32)
+            val transactions = dtos.map { it.toDomain() }
             
-            val response = httpClient.newCall(request).execute()
-            
-            if (!response.isSuccessful) {
-                return@withContext Result.failure(
-                    Exception("API request failed: ${response.code}")
-                )
-            }
-            
-            val jsonString = response.body?.string() ?: return@withContext Result.success(emptyList())
-            Result.success(Transaction.parseFromJson(jsonString))
+            Result.success(transactions)
         } catch (e: Exception) {
             Log.e(TAG, "Error fetching transactions: ${e.message}", e)
             Result.failure(e)

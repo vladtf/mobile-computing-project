@@ -62,6 +62,7 @@ dependencies {
     // Network - Required by erdkotlin
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.moshi)
+    implementation(libs.retrofit.converter.kotlinx.serialization)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
     implementation(libs.moshi)
