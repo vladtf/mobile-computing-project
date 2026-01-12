@@ -8,9 +8,11 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.vti.mcproject.R
 import com.vti.mcproject.data.model.Transaction
 import com.vti.mcproject.ui.viewmodel.DetailedTransactionViewModel
 import java.text.SimpleDateFormat
@@ -38,10 +40,13 @@ fun DetailedTransactionScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Details") },
+                title = { Text(stringResource(R.string.transaction_details_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.action_back)
+                        )
                     }
                 }
             )
@@ -58,12 +63,12 @@ fun DetailedTransactionScreen(
             // Amount - prominent display
             Column {
                 Text(
-                    text = "Amount",
+                    text = stringResource(R.string.label_amount),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "${transaction.value} EGLD",
+                    text = stringResource(R.string.balance_format, transaction.value),
                     style = MaterialTheme.typography.displaySmall,
                     modifier = Modifier.padding(top = 4.dp)
                 )
@@ -71,23 +76,33 @@ fun DetailedTransactionScreen(
             
             HorizontalDivider()
             
-            InfoField("Status", transaction.status.uppercase())
-            InfoField("Hash", transaction.hash)
-            InfoField("From", transaction.sender)
-            InfoField("To", transaction.receiver)
-            InfoField("Fee", "${transaction.fee} EGLD")
-            InfoField("Gas", "${transaction.gasUsed} / ${transaction.gasLimit}")
-            InfoField("Time", formatTimestamp(transaction.timestamp))
+            InfoField(stringResource(R.string.label_status), transaction.status.uppercase())
+            InfoField(stringResource(R.string.label_hash), transaction.hash, useMonospace = true)
+            InfoField(stringResource(R.string.label_from), transaction.sender, useMonospace = true)
+            InfoField(stringResource(R.string.label_to), transaction.receiver, useMonospace = true)
+            InfoField(
+                stringResource(R.string.label_fee),
+                stringResource(R.string.fee_format, transaction.fee)
+            )
+            InfoField(
+                stringResource(R.string.label_gas),
+                stringResource(R.string.gas_format, transaction.gasUsed.toString(), transaction.gasLimit.toString())
+            )
+            InfoField(stringResource(R.string.label_time), formatTimestamp(transaction.timestamp))
             
             if (!transaction.data.isNullOrEmpty()) {
-                InfoField("Data", transaction.data)
+                InfoField(stringResource(R.string.label_data), transaction.data)
             }
         }
     }
 }
 
 @Composable
-private fun InfoField(label: String, value: String) {
+private fun InfoField(
+    label: String,
+    value: String,
+    useMonospace: Boolean = false
+) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = label,
@@ -97,7 +112,7 @@ private fun InfoField(label: String, value: String) {
         Text(
             text = value,
             style = MaterialTheme.typography.bodyLarge,
-            fontFamily = if (label in listOf("Hash", "From", "To")) FontFamily.Monospace else FontFamily.Default,
+            fontFamily = if (useMonospace) FontFamily.Monospace else FontFamily.Default,
             modifier = Modifier.padding(top = 4.dp)
         )
     }

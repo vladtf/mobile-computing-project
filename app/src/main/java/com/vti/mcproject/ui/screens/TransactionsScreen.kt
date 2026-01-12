@@ -10,8 +10,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.vti.mcproject.R
 import com.vti.mcproject.data.model.Transaction
 import com.vti.mcproject.ui.AppViewModelProvider
 import com.vti.mcproject.ui.viewmodel.TransactionsViewModel
@@ -28,13 +30,14 @@ fun TransactionsScreen(
     var selectedTransaction by remember { mutableStateOf<Transaction?>(null) }
 
     val snackbarHostState = remember { SnackbarHostState() }
+    val retryLabel = stringResource(R.string.action_retry)
 
     // Show error in Snackbar
     LaunchedEffect(errorMessage) {
         errorMessage?.let { message ->
             val result = snackbarHostState.showSnackbar(
                 message = message,
-                actionLabel = "Retry",
+                actionLabel = retryLabel,
                 duration = SnackbarDuration.Long
             )
             if (result == SnackbarResult.ActionPerformed) {
@@ -56,7 +59,7 @@ fun TransactionsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Transactions") },
+                title = { Text(stringResource(R.string.transactions_title)) },
                 actions = {
                     IconButton(
                         onClick = { viewModel.refresh() },
@@ -70,7 +73,7 @@ fun TransactionsScreen(
                         } else {
                             Icon(
                                 imageVector = Icons.Default.Refresh,
-                                contentDescription = "Refresh"
+                                contentDescription = stringResource(R.string.action_refresh)
                             )
                         }
                     }
@@ -88,7 +91,7 @@ fun TransactionsScreen(
         ) {
             item {
                 Text(
-                    text = "${accountInfo?.balance ?: "0"} EGLD",
+                    text = stringResource(R.string.balance_format, accountInfo?.balance ?: "0"),
                     style = MaterialTheme.typography.headlineLarge,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
@@ -128,7 +131,7 @@ private fun TransactionItem(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "${transaction.value} EGLD",
+                text = stringResource(R.string.balance_format, transaction.value),
                 style = MaterialTheme.typography.titleMedium
             )
             Text(

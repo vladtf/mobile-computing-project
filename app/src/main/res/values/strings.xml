@@ -6,6 +6,32 @@
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
+    <!-- Screen titles -->
+    <string name="transactions_title">Transactions</string>
+    <string name="transaction_details_title">Details</string>
+
+    <!-- Actions -->
+    <string name="action_refresh">Refresh</string>
+    <string name="action_back">Back</string>
+    <string name="action_retry">Retry</string>
+
+    <!-- Labels -->
+    <string name="label_amount">Amount</string>
+    <string name="label_status">Status</string>
+    <string name="label_hash">Hash</string>
+    <string name="label_from">From</string>
+    <string name="label_to">To</string>
+    <string name="label_fee">Fee</string>
+    <string name="label_gas">Gas</string>
+    <string name="label_time">Time</string>
+    <string name="label_data">Data</string>
+
+    <!-- Currency -->
+    <string name="currency_egld">EGLD</string>
+    <string name="balance_format">%1$s EGLD</string>
+    <string name="fee_format">%1$s EGLD</string>
+    <string name="gas_format">%1$s / %2$s</string>
+
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
         volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus
