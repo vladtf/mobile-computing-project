@@ -6,7 +6,6 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.vti.mcproject.MCProjectApplication
-import com.vti.mcproject.ui.viewmodel.DetailedTransactionViewModel
 import com.vti.mcproject.ui.viewmodel.TransactionsViewModel
 
 /**
@@ -22,11 +21,6 @@ object AppViewModelProvider {
                 transactionRepository = mcProjectApplication().container.transactionRepository,
                 accountInfoRepository = mcProjectApplication().container.accountInfoRepository
             )
-        }
-
-        // Initializer for DetailedTransactionViewModel
-        initializer {
-            DetailedTransactionViewModel()
         }
     }
 }

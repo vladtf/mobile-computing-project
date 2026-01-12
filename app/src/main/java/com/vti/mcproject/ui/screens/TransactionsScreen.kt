@@ -24,7 +24,25 @@ fun TransactionsScreen(
     val transactions by viewModel.transactions.collectAsState()
     val accountInfo by viewModel.accountInfo.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
     var selectedTransaction by remember { mutableStateOf<Transaction?>(null) }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Show error in Snackbar
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let { message ->
+            val result = snackbarHostState.showSnackbar(
+                message = message,
+                actionLabel = "Retry",
+                duration = SnackbarDuration.Long
+            )
+            if (result == SnackbarResult.ActionPerformed) {
+                viewModel.refresh()
+            }
+            viewModel.clearError()
+        }
+    }
 
     // Show detail screen if a transaction is selected
     selectedTransaction?.let { transaction ->
@@ -58,7 +76,8 @@ fun TransactionsScreen(
                     }
                 }
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
         LazyColumn(
             modifier = Modifier

@@ -12,7 +12,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vti.mcproject.data.model.Transaction
-import com.vti.mcproject.ui.AppViewModelProvider
 import com.vti.mcproject.ui.viewmodel.DetailedTransactionViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -22,7 +21,7 @@ import java.util.*
 fun DetailedTransactionScreen(
     transaction: Transaction,
     onNavigateBack: () -> Unit = {},
-    viewModel: DetailedTransactionViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: DetailedTransactionViewModel = viewModel()
 ) {
     // Set the transaction in ViewModel when screen is displayed
     LaunchedEffect(transaction) {
