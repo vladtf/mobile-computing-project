@@ -3,96 +3,78 @@ package com.vti.mcproject.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vti.mcproject.R
-import com.vti.mcproject.data.model.Transaction
-import com.vti.mcproject.ui.viewmodel.DetailedTransactionViewModel
+import com.vti.mcproject.ui.viewmodel.TransactionsViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailedTransactionScreen(
-    transaction: Transaction,
-    onNavigateBack: () -> Unit = {},
-    viewModel: DetailedTransactionViewModel = viewModel()
+    txHash: String,
+    transactionsViewModel: TransactionsViewModel,
+    modifier: Modifier = Modifier
 ) {
-    // Set the transaction in ViewModel when screen is displayed
-    LaunchedEffect(transaction) {
-        viewModel.setTransaction(transaction)
-    }
+    val transactions by transactionsViewModel.transactions.collectAsState()
+    val transaction = transactions.find { it?.hash == txHash }
 
-    // Clear transaction when leaving the screen
-    DisposableEffect(Unit) {
-        onDispose {
-            viewModel.clearTransaction()
-        }
-    }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.transaction_details_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.action_back)
-                        )
-                    }
-                }
-            )
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+    if (transaction == null) {
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            // Amount - prominent display
-            Column {
-                Text(
-                    text = stringResource(R.string.label_amount),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = stringResource(R.string.balance_format, transaction.value),
-                    style = MaterialTheme.typography.displaySmall,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
-            
-            HorizontalDivider()
-            
-            InfoField(stringResource(R.string.label_status), transaction.status.uppercase())
-            InfoField(stringResource(R.string.label_hash), transaction.hash, useMonospace = true)
-            InfoField(stringResource(R.string.label_from), transaction.sender, useMonospace = true)
-            InfoField(stringResource(R.string.label_to), transaction.receiver, useMonospace = true)
-            InfoField(
-                stringResource(R.string.label_fee),
-                stringResource(R.string.fee_format, transaction.fee)
+            Text(
+                text = "Transaction not found",
+                style = MaterialTheme.typography.bodyLarge
             )
-            InfoField(
-                stringResource(R.string.label_gas),
-                stringResource(R.string.gas_format, transaction.gasUsed.toString(), transaction.gasLimit.toString())
+        }
+        return
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        Column {
+            Text(
+                text = stringResource(R.string.label_amount),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            InfoField(stringResource(R.string.label_time), formatTimestamp(transaction.timestamp))
-            
-            if (!transaction.data.isNullOrEmpty()) {
-                InfoField(stringResource(R.string.label_data), transaction.data)
-            }
+            Text(
+                text = stringResource(R.string.balance_format, transaction.value),
+                style = MaterialTheme.typography.displaySmall,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+        
+        HorizontalDivider()
+        
+        InfoField(stringResource(R.string.label_status), transaction.status.uppercase())
+        InfoField(stringResource(R.string.label_hash), transaction.hash, useMonospace = true)
+        InfoField(stringResource(R.string.label_from), transaction.sender, useMonospace = true)
+        InfoField(stringResource(R.string.label_to), transaction.receiver, useMonospace = true)
+        InfoField(
+            stringResource(R.string.label_fee),
+            stringResource(R.string.fee_format, transaction.fee)
+        )
+        InfoField(
+            stringResource(R.string.label_gas),
+            stringResource(R.string.gas_format, transaction.gasUsed.toString(), transaction.gasLimit.toString())
+        )
+        InfoField(stringResource(R.string.label_time), formatTimestamp(transaction.timestamp))
+        
+        if (!transaction.data.isNullOrEmpty()) {
+            InfoField(stringResource(R.string.label_data), transaction.data)
         }
     }
 }
