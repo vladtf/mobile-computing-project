@@ -69,6 +69,10 @@
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
     
+    <!-- Messages -->
+    <string name="action_dismiss">Dismiss</string>
+    <string name="transaction_not_found">Transaction not found</string>
+    
     <!-- Blockchain strings -->
     <string name="registration_fees">Registration Fees</string>
     <string name="regular_fee">Regular Fee:</string>

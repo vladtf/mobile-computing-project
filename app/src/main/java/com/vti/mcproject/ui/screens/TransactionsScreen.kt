@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.vti.mcproject.R
 import com.vti.mcproject.data.model.Transaction
 import com.vti.mcproject.ui.viewmodel.TransactionsViewModel
+import com.vti.mcproject.utils.AddressUtils
 
 @Composable
 fun TransactionsScreen(
@@ -39,7 +40,7 @@ fun TransactionsScreen(
                 ) {
                     Text(errorMessage!!, modifier = Modifier.weight(1f))
                     TextButton(onClick = { viewModel.clearError() }) {
-                        Text("Dismiss")
+                        Text(stringResource(R.string.action_dismiss))
                     }
                 }
             }
@@ -106,20 +107,12 @@ private fun TransactionItem(
         Spacer(modifier = Modifier.height(4.dp))
         
         Text(
-            text = "${shortenAddress(transaction.sender)} → ${shortenAddress(transaction.receiver)}",
+            text = "${AddressUtils.shortenAddress(transaction.sender)} → ${AddressUtils.shortenAddress(transaction.receiver)}",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         
         Spacer(modifier = Modifier.height(16.dp))
         HorizontalDivider()
-    }
-}
-
-private fun shortenAddress(address: String): String {
-    return if (address.length > 13) {
-        "${address.take(6)}...${address.takeLast(4)}"
-    } else {
-        address
     }
 }
